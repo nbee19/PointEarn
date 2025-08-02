@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PointEarn - Telegram Mini App</title>
+    <script src='//libtl.com/sdk.js' data-zone='9649206' data-sdk='show_9649206'></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366F1;
+            --primary-dark: #4F46E5;
+            --secondary: #10B981;
+            --dark: #1F2937;
+            --light: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            margin: 1rem;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .app-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        
+        .points-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-top: 1.25rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .points-label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .points-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-top: 0.25rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 1rem 1rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .card-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-icon.primary {
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
+            color: white;
+        }
+        
+        .card-icon.secondary {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            width: 100%;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary), #059669);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .timer-card {
+            background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1.25rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .timer-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .timer {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .progress-card {
+            background: var(--light);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .progress-bar {
+            height: 0.75rem;
+            background-color: var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary), #059669);
+            border-radius: 0.5rem;
+            transition: width 0.3s ease;
+        }
+        
+        .referral-link-card {
+            background: linear-gradient(135deg, #F9FAFB, #F3F4F6);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            word-break: break-all;
+            margin-top: 1.25rem;
+            position: relative;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        .copy-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .copy-icon:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-50%) scale(1.05);
+        }
+        
+        .withdrawal-info-card {
+            background: linear-gradient(135deg, #F9FAFB, #F3F4F6);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            border: 1px solid var(--border);
+        }
+        
+        .withdrawal-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .withdrawal-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .withdrawal-value {
+            text-align: right;
+        }
+        
+        .withdrawal-value-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .withdrawal-value-amount {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--primary);
+        }
+        
+        .bottom-nav-card {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.75rem 1rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 1rem;
+            width: 4.5rem;
+            position: relative;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+        }
+        
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2rem;
+            height: 0.25rem;
+            background: var(--primary);
+            border-radius: 0 0 0.25rem 0.25rem;
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(99, 102, 241, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .sponsor-card {
+            background: linear-gradient(90deg, #4F46E5, #7C3AED);
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            font-weight: 600;
+            position: fixed;
+            bottom: 5rem;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .sponsor-card a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .notification-card {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 320px;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .notification-card.show {
+            transform: translateX(0);
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+            color: var(--secondary);
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .notification-message {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .modal-card {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            padding: 1rem;
+        }
+        
+        .modal-card.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content-card {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal-card.show .modal-content-card {
+            transform: translateY(0);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            transition: all 0.2s;
+        }
+        
+        .close-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            transform: rotate(90deg);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: var(--light);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: white;
+        }
+        
+        .withdrawal-summary-card {
+            background: linear-gradient(135deg, #F9FAFB, #F3F4F6);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+        
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-top: 1px solid var(--border);
+            padding-top: 0.75rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+        
+        .summary-label {
+            color: var(--text-secondary);
+        }
+        
+        .summary-value {
+            font-weight: 600;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @media (max-width: 480px) {
+            .app-container {
+                max-width: 100%;
+            }
+            
+            .notification-card {
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Card -->
+        <div class="header-card">
+            <div class="header-content">
+                <h1 class="app-title">PointEarn</h1>
+                <div class="bg-white/20 p-2 rounded-full">
+                    <i class="fas fa-coins text-yellow-300"></i>
+                </div>
+            </div>
+            
+            <div class="points-card">
+                <div class="points-label">Your Points</div>
+                <div class="points-value" id="userPoints">0</div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Watch Ad Card -->
+            <div id="watchTab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon primary">
+                            <i class="fas fa-ad"></i>
+                        </div>
+                        <h2 class="card-title">Watch & Earn</h2>
+                    </div>
+                    
+                    <p class="card-description">Watch an ad to earn <span class="font-semibold">20 points</span>. Wait 30 seconds between ads.</p>
+                    
+                    <button id="watchAdBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Watch Ad & Earn Points
+                    </button>
+                    
+                    <div id="adTimer" class="timer-card hidden">
+                        <div class="timer-label">Next ad available in:</div>
+                        <div class="timer" id="countdown">30</div>
+                        <div class="progress-card">
+                            <div class="progress-bar">
+                                <div class="progress" id="progressBar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Referral Card -->
+            <div id="referralTab" class="tab-content hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <h2 class="card-title">Referral Program</h2>
+                    </div>
+                    
+                    <p class="card-description">Invite friends and earn <span class="font-semibold">100 points</span> per referral.</p>
+                    
+                    <div class="referral-link-card" id="referralLink">
+                        https://t.me/PointEarnBot?start=REF123456
+                        <div class="copy-icon" id="copyRefBtn">
+                            <i class="fas fa-copy"></i>
+                        </div>
+                    </div>
+                    
+                    <button id="copyRefBtn2" class="btn btn-secondary mt-4">
+                        <i class="fas fa-copy"></i> Copy Referral Link
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Withdraw Card -->
+            <div id="withdrawTab" class="tab-content hidden">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon secondary">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <h2 class="card-title">Withdraw Points</h2>
+                    </div>
+                    
+                    <div class="withdrawal-info-card">
+                        <div class="withdrawal-row">
+                            <div class="withdrawal-label">Withdrawal Rate</div>
+                            <div class="withdrawal-value">
+                                <div class="withdrawal-value-label">4000 points = $2 USD</div>
+                            </div>
+                        </div>
+                        <div class="withdrawal-row">
+                            <div class="withdrawal-label">Your Balance</div>
+                            <div class="withdrawal-value">
+                                <div class="withdrawal-value-amount" id="balanceForWithdrawal">0 points</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-card">
+                        <div class="progress-bar">
+                            <div class="progress" id="withdrawProgress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <button id="withdrawBtn" class="btn btn-secondary mt-4" disabled>
+                        <i class="fas fa-hand-holding-usd"></i> Withdraw to PayPal
+                    </button>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Sponsor Card -->
+        <div class="sponsor-card">
+            <a href="https://www.hhminer.online" target="_blank">
+                <i class="fas fa-bolt"></i> Buy Flash USDT Here
+            </a>
+        </div>
+        
+        <!-- Bottom Navigation Card -->
+        <nav class="bottom-nav-card">
+            <div class="nav-container">
+                <div class="nav-item active" data-tab="watchTab">
+                    <i class="fas fa-play-circle nav-icon"></i>
+                    <span class="nav-label">Watch</span>
+                </div>
+                <div class="nav-item" data-tab="referralTab">
+                    <i class="fas fa-user-plus nav-icon"></i>
+                    <span class="nav-label">Referral</span>
+                </div>
+                <div class="nav-item" data-tab="withdrawTab">
+                    <i class="fas fa-wallet nav-icon"></i>
+                    <span class="nav-label">Withdraw</span>
+                </div>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Notification Card -->
+    <div id="notification" class="notification-card">
+        <i class="fas fa-check-circle notification-icon"></i>
+        <div class="notification-content">
+            <div class="notification-title" id="notificationTitle">Success!</div>
+            <div class="notification-message" id="notificationMessage">You've earned 20 points.</div>
+        </div>
+    </div>
+    
+    <!-- Withdrawal Modal Card -->
+    <div id="withdrawModal" class="modal-card">
+        <div class="modal-content-card">
+            <div class="modal-header">
+                <h3 class="modal-title">Withdraw to PayPal</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="paypalEmail">PayPal Email</label>
+                <input type="email" id="paypalEmail" class="form-input" placeholder="your@email.com">
+            </div>
+            
+            <div class="withdrawal-summary-card">
+                <div class="summary-row">
+                    <span class="summary-label">Points:</span>
+                    <span class="summary-value" id="withdrawPoints">4000</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Amount:</span>
+                    <span class="summary-value">$2.00 USD</span>
+                </div>
+            </div>
+            
+            <button id="confirmWithdrawBtn" class="btn btn-secondary">
+                <i class="fas fa-paper-plane"></i> Confirm Withdrawal
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize app data
+        let appData = {
+            points: 0,
+            lastAdWatched: null,
+            referralCode: generateReferralCode(),
+            referredBy: null
+        };
+        
+        // DOM elements
+        const userPointsEl = document.getElementById('userPoints');
+        const watchAdBtn = document.getElementById('watchAdBtn');
+        const adTimerEl = document.getElementById('adTimer');
+        const countdownEl = document.getElementById('countdown');
+        const progressBarEl = document.getElementById('progressBar');
+        const copyRefBtn = document.getElementById('copyRefBtn');
+        const copyRefBtn2 = document.getElementById('copyRefBtn2');
+        const referralLinkEl = document.getElementById('referralLink');
+        const withdrawBtn = document.getElementById('withdrawBtn');
+        const balanceForWithdrawalEl = document.getElementById('balanceForWithdrawal');
+        const withdrawProgressEl = document.getElementById('withdrawProgress');
+        const notificationEl = document.getElementById('notification');
+        const notificationTitleEl = document.getElementById('notificationTitle');
+        const notificationMessageEl = document.getElementById('notificationMessage');
+        const withdrawModalEl = document.getElementById('withdrawModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const paypalEmailEl = document.getElementById('paypalEmail');
+        const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
+        const withdrawPointsEl = document.getElementById('withdrawPoints');
+        
+        // Tab navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Load data from localStorage
+        function loadData() {
+            const savedData = localStorage.getItem('pointEarnData');
+            if (savedData) {
+                appData = JSON.parse(savedData);
+            }
+            
+            // Check for referral in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            
+            if (refCode && refCode !== appData.referralCode && !appData.referredBy) {
+                appData.referredBy = refCode;
+                showNotification('Referral Applied!', 'You were referred by a friend. +100 points!', 'success');
+                appData.points += 100;
+                saveData();
+            }
+            
+            updateUI();
+        }
+        
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('pointEarnData', JSON.stringify(appData));
+        }
+        
+        // Generate random referral code
+        function generateReferralCode() {
+            return 'REF' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+        
+        // Update UI elements
+        function updateUI() {
+            userPointsEl.textContent = appData.points;
+            balanceForWithdrawalEl.textContent = `${appData.points} points`;
+            
+            // Update withdrawal progress
+            const withdrawProgress = Math.min(100, (appData.points / 4000) * 100);
+            withdrawProgressEl.style.width = `${withdrawProgress}%`;
+            
+            // Enable/disable withdraw button
+            withdrawBtn.disabled = appData.points < 4000;
+            
+            // Set referral link
+            referralLinkEl.textContent = `https://t.me/PointEarnBot?start=${appData.referralCode}`;
+            
+            // Check if ad cooldown is active
+            if (appData.lastAdWatched) {
+                const timeSinceLastAd = Date.now() - appData.lastAdWatched;
+                const cooldownTime = 30000; // 30 seconds
+                
+                if (timeSinceLastAd < cooldownTime) {
+                    startAdCooldown(cooldownTime - timeSinceLastAd);
+                }
+            }
+        }
+        
+        // Start ad cooldown
+        function startAdCooldown(timeLeft) {
+            watchAdBtn.disabled = true;
+            adTimerEl.classList.remove('hidden');
+            
+            const interval = setInterval(() => {
+                timeLeft -= 1000;
+                const seconds = Math.ceil(timeLeft / 1000);
+                countdownEl.textContent = seconds;
+                
+                // Update progress bar
+                const progress = ((30000 - timeLeft) / 30000) * 100;
+                progressBarEl.style.width = `${progress}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    watchAdBtn.disabled = false;
+                    adTimerEl.classList.add('hidden');
+                    progressBarEl.style.width = '0%';
+                }
+            }, 1000);
+        }
+        
+        // Show notification
+        function showNotification(title, message, type = 'success') {
+            notificationTitleEl.textContent = title;
+            notificationMessageEl.textContent = message;
+            notificationEl.classList.add('show');
+            
+            setTimeout(() => {
+                notificationEl.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Tab switching
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const tabId = item.getAttribute('data-tab');
+                
+                // Update active nav item
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                
+                // Show corresponding tab
+                tabContents.forEach(tab => tab.classList.add('hidden'));
+                document.getElementById(tabId).classList.remove('hidden');
+            });
+        });
+        
+        // Watch ad button click
+        watchAdBtn.addEventListener('click', () => {
+            // Show ad using Monetag SDK
+            show_9649206().then(() => {
+                // Add points after ad is watched
+                appData.points += 20;
+                appData.lastAdWatched = Date.now();
+                saveData();
+                updateUI();
+                
+                showNotification('Ad Watched!', 'You earned 20 points.', 'success');
+                
+                // Start cooldown
+                startAdCooldown(30000);
+            }).catch(error => {
+                console.error('Ad error:', error);
+                showNotification('Ad Error', 'Failed to load ad. Please try again.', 'info');
+            });
+        });
+        
+        // Copy referral buttons
+        function copyReferralLink() {
+            navigator.clipboard.writeText(referralLinkEl.textContent)
+                .then(() => {
+                    showNotification('Copied!', 'Referral link copied to clipboard.', 'success');
+                })
+                .catch(() => {
+                    showNotification('Error', 'Failed to copy link.', 'info');
+                });
+        }
+        
+        copyRefBtn.addEventListener('click', copyReferralLink);
+        copyRefBtn2.addEventListener('click', copyReferralLink);
+        
+        // Withdraw button
+        withdrawBtn.addEventListener('click', () => {
+            withdrawPointsEl.textContent = '4000';
+            withdrawModalEl.classList.add('show');
+        });
+        
+        // Close modal
+        closeModalBtn.addEventListener('click', () => {
+            withdrawModalEl.classList.remove('show');
+        });
+        
+        // Confirm withdrawal
+        confirmWithdrawBtn.addEventListener('click', () => {
+            const email = paypalEmailEl.value.trim();
+            
+            if (!email) {
+                showNotification('Error', 'Please enter your PayPal email.', 'info');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showNotification('Error', 'Please enter a valid email address.', 'info');
+                return;
+            }
+            
+            // Process withdrawal
+            appData.points -= 4000;
+            saveData();
+            updateUI();
+            
+            showNotification('Withdrawal Successful!', '$2.00 USD sent to your PayPal.', 'success');
+            
+            // Reset form and close modal
+            paypalEmailEl.value = '';
+            withdrawModalEl.classList.remove('show');
+        });
+        
+        // Validate email
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        // Initialize app
+        loadData();
+    </script>
+</body>
+</html>
