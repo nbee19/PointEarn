@@ -20,6 +20,7 @@
             --border: #E5E7EB;
             --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --ad-gradient: linear-gradient(135deg, #4F46E5, #7C3AED);
         }
         
         * {
@@ -376,29 +377,132 @@
             font-weight: 600;
         }
         
-        .sponsor-card {
-            background: linear-gradient(90deg, #4F46E5, #7C3AED);
-            color: white;
-            text-align: center;
-            padding: 1rem;
-            font-weight: 600;
+        /* Ad Card Styles */
+        .ad-card {
+            background: white;
+            border-radius: 1.5rem;
+            margin: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
             position: fixed;
             bottom: 5rem;
             left: 0;
             right: 0;
             z-index: 50;
-            box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1);
             max-width: 480px;
             margin: 0 auto;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
         
-        .sponsor-card a {
+        .ad-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15);
+        }
+        
+        .ad-header {
+            background: var(--ad-gradient);
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .ad-label {
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .ad-close {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 1.75rem;
+            height: 1.75rem;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .ad-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+        
+        .ad-content {
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .ad-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .ad-details {
+            flex: 1;
+        }
+        
+        .ad-title {
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+        
+        .ad-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .ad-cta {
+            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .ad-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+        }
+        
+        .ad-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .ad-spacer {
+            height: 1rem;
+            width: 100%;
         }
         
         .notification-card {
@@ -708,12 +812,32 @@
             </div>
         </main>
         
-        <!-- Sponsor Card -->
-        <div class="sponsor-card">
-            <a href="https://www.hhminer.online" target="_blank">
-                <i class="fas fa-bolt"></i> Buy Flash USDT Here
+        <!-- Ad Card -->
+        <div class="ad-card" id="adCard">
+            <div class="ad-header">
+                <div class="ad-label">Sponsored</div>
+                <div class="ad-close" id="adClose">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <a href="https://www.hhminer.online" target="_blank" class="ad-link">
+                <div class="ad-content">
+                    <div class="ad-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="ad-details">
+                        <div class="ad-title">Buy Flash USDT Here</div>
+                        <div class="ad-description">Fast, secure, and reliable</div>
+                        <div class="ad-cta">
+                            Visit Now <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
             </a>
         </div>
+        
+        <!-- Line break after sponsor ad -->
+        <br><br><br><br><br><br>
         
         <!-- Bottom Navigation Card -->
         <nav class="bottom-nav-card">
@@ -779,7 +903,8 @@
             points: 0,
             lastAdWatched: null,
             referralCode: generateReferralCode(),
-            referredBy: null
+            referredBy: null,
+            adDismissed: false
         };
         
         // DOM elements
@@ -802,6 +927,8 @@
         const paypalEmailEl = document.getElementById('paypalEmail');
         const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
         const withdrawPointsEl = document.getElementById('withdrawPoints');
+        const adCard = document.getElementById('adCard');
+        const adClose = document.getElementById('adClose');
         
         // Tab navigation
         const navItems = document.querySelectorAll('.nav-item');
@@ -852,6 +979,13 @@
             
             // Set referral link
             referralLinkEl.textContent = `https://t.me/PointEarnBot?start=${appData.referralCode}`;
+            
+            // Show/hide ad card
+            if (appData.adDismissed) {
+                adCard.style.display = 'none';
+            } else {
+                adCard.style.display = 'block';
+            }
             
             // Check if ad cooldown is active
             if (appData.lastAdWatched) {
@@ -989,6 +1123,13 @@
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
+        
+        // Ad close button
+        adClose.addEventListener('click', () => {
+            appData.adDismissed = true;
+            saveData();
+            adCard.style.display = 'none';
+        });
         
         // Initialize app
         loadData();
