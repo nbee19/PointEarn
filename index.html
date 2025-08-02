@@ -381,7 +381,6 @@
         .ad-card {
             background: white;
             border-radius: 1.5rem;
-            margin: 1rem;
             overflow: hidden;
             box-shadow: var(--shadow-lg);
             border: 1px solid var(--border);
@@ -417,24 +416,6 @@
             border-radius: 1rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-        }
-        
-        .ad-close {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 1.75rem;
-            height: 1.75rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .ad-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
         }
         
         .ad-content {
@@ -497,11 +478,6 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            width: 100%;
-        }
-        
-        .ad-spacer {
-            height: 1rem;
             width: 100%;
         }
         
@@ -813,12 +789,9 @@
         </main>
         
         <!-- Ad Card -->
-        <div class="ad-card" id="adCard">
+        <div class="ad-card">
             <div class="ad-header">
                 <div class="ad-label">Sponsored</div>
-                <div class="ad-close" id="adClose">
-                    <i class="fas fa-times"></i>
-                </div>
             </div>
             <a href="https://www.hhminer.online" target="_blank" class="ad-link">
                 <div class="ad-content">
@@ -827,7 +800,7 @@
                     </div>
                     <div class="ad-details">
                         <div class="ad-title">Buy Flash USDT Here</div>
-                        <div class="ad-description">Fast, secure, and reliable</div>
+                        <div class="ad-description">Fast, secure, and reliable cryptocurrency exchange</div>
                         <div class="ad-cta">
                             Visit Now <i class="fas fa-arrow-right"></i>
                         </div>
@@ -835,9 +808,6 @@
                 </div>
             </a>
         </div>
-        
-        <!-- Line break after sponsor ad -->
-        <br><br><br><br><br><br>
         
         <!-- Bottom Navigation Card -->
         <nav class="bottom-nav-card">
@@ -903,8 +873,7 @@
             points: 0,
             lastAdWatched: null,
             referralCode: generateReferralCode(),
-            referredBy: null,
-            adDismissed: false
+            referredBy: null
         };
         
         // DOM elements
@@ -927,8 +896,6 @@
         const paypalEmailEl = document.getElementById('paypalEmail');
         const confirmWithdrawBtn = document.getElementById('confirmWithdrawBtn');
         const withdrawPointsEl = document.getElementById('withdrawPoints');
-        const adCard = document.getElementById('adCard');
-        const adClose = document.getElementById('adClose');
         
         // Tab navigation
         const navItems = document.querySelectorAll('.nav-item');
@@ -979,13 +946,6 @@
             
             // Set referral link
             referralLinkEl.textContent = `https://t.me/PointEarnBot?start=${appData.referralCode}`;
-            
-            // Show/hide ad card
-            if (appData.adDismissed) {
-                adCard.style.display = 'none';
-            } else {
-                adCard.style.display = 'block';
-            }
             
             // Check if ad cooldown is active
             if (appData.lastAdWatched) {
@@ -1123,13 +1083,6 @@
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
-        
-        // Ad close button
-        adClose.addEventListener('click', () => {
-            appData.adDismissed = true;
-            saveData();
-            adCard.style.display = 'none';
-        });
         
         // Initialize app
         loadData();
